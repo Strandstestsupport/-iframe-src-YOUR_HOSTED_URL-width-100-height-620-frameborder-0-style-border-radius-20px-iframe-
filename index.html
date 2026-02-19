@@ -3,525 +3,951 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XBB System — FAQ Assistant</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Strands AI Support</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --border: #2a2a2a;
+  --border2: #333333;
+  --accent: #3b82f6;
+  --accent-dark: #2563eb;
+  --accent-glow: rgba(59,130,246,0.15);
+  --text: #f0f0f0;
+  --text2: #a0a0a0;
+  --muted: #666;
+  --bot-bg: #161616;
+  --user-bg: #1d3a6e;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #f59e0b;
+}
 
-  :root {
-    --bg: #f5f3ef;
-    --surface: #ffffff;
-    --border: #e2ddd6;
-    --accent: #e85d04;
-    --accent-dark: #c44c00;
-    --accent-light: #fff0e8;
-    --text: #1a1614;
-    --muted: #7a7067;
-    --bot-bg: #f9f7f4;
-    --user-bg: #e85d04;
-  }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; padding: 20px;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 10%, rgba(59,130,246,0.03) 0%, transparent 50%);
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 20px;
-    background-image: radial-gradient(circle at 80% 20%, rgba(232,93,4,0.07) 0%, transparent 50%),
-                      radial-gradient(circle at 10% 80%, rgba(232,93,4,0.04) 0%, transparent 40%);
-  }
+/* ── SETUP MODAL ── */
+.setup-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px); display: flex; align-items: center;
+  justify-content: center; z-index: 1000; padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+.setup-overlay.hidden { display: none; }
 
-  .wrapper { width: 100%; max-width: 700px; }
+.setup-card {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 36px; max-width: 460px; width: 100%;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  animation: slideUp 0.4s ease;
+}
 
-  .header {
-    display: flex; align-items: center; gap: 16px;
-    margin-bottom: 24px;
-    animation: fadeDown 0.5s ease both;
-  }
+.setup-logo {
+  width: 52px; height: 52px; background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px; color: white;
+  margin-bottom: 20px; box-shadow: 0 0 24px rgba(59,130,246,0.3);
+  letter-spacing: -0.5px;
+}
 
-  .logo-mark {
-    width: 48px; height: 48px; background: var(--accent);
-    border-radius: 12px; display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; color: white;
-    flex-shrink: 0; box-shadow: 0 4px 14px rgba(232,93,4,0.3);
-  }
+.setup-card h2 {
+  font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700;
+  color: var(--text); margin-bottom: 6px;
+}
 
-  .header-text h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); }
-  .header-text p { font-size: 13px; color: var(--muted); margin-top: 2px; font-weight: 300; }
+.setup-card p { font-size: 13.5px; color: var(--text2); line-height: 1.6; margin-bottom: 24px; }
 
-  .status-dot {
-    width: 7px; height: 7px; background: #22c55e; border-radius: 50%;
-    display: inline-block; margin-right: 5px; animation: pulse 2s infinite;
-  }
+.setup-card p a { color: var(--accent); text-decoration: none; }
+.setup-card p a:hover { text-decoration: underline; }
 
-  .chat-box {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; overflow: hidden;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
-    animation: fadeUp 0.6s ease both 0.1s;
-  }
+.setup-label {
+  font-size: 12px; font-weight: 600; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; display: block;
+}
 
-  .messages {
-    height: 460px; overflow-y: auto;
-    padding: 24px 22px;
-    display: flex; flex-direction: column; gap: 14px;
-    scroll-behavior: smooth;
-  }
+.api-input-wrap { position: relative; margin-bottom: 16px; }
+.api-input-wrap input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 11px 44px 11px 14px;
+  color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px;
+  outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.api-input-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.api-input-wrap input::placeholder { color: var(--muted); }
+.eye-btn {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--muted); cursor: pointer;
+  font-size: 16px; padding: 2px;
+}
+.eye-btn:hover { color: var(--text2); }
 
-  .messages::-webkit-scrollbar { width: 4px; }
-  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.api-hint {
+  font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.5;
+}
+.api-hint a { color: var(--accent); }
 
-  .message { display: flex; gap: 10px; animation: msgIn 0.3s ease both; }
-  .message.user { flex-direction: row-reverse; }
+.model-select-wrap { margin-bottom: 20px; }
+.model-select-wrap select {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 11px 14px; color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 14px; outline: none;
+  cursor: pointer; transition: border-color 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+.model-select-wrap select:focus { border-color: var(--accent); }
+.model-select-wrap select option { background: #1a1a1a; }
 
-  .avatar {
-    width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; font-family: 'Syne', sans-serif;
-  }
+.start-btn {
+  width: 100%; padding: 12px; background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none; border-radius: 10px; color: white;
+  font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(59,130,246,0.3);
+}
+.start-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(59,130,246,0.4); }
+.start-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-  .bot-avatar { background: var(--accent); color: white; box-shadow: 0 2px 8px rgba(232,93,4,0.25); }
-  .user-avatar { background: #e8e3db; color: var(--muted); }
+.setup-error {
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+  color: #fca5a5; border-radius: 8px; padding: 10px 14px;
+  font-size: 13px; margin-top: 12px; display: none;
+}
 
-  .bubble {
-    max-width: 80%; padding: 12px 16px; border-radius: 14px;
-    font-size: 14px; line-height: 1.7;
-  }
+/* ── APP SHELL ── */
+.wrapper { width: 100%; max-width: 780px; }
 
-  .bot .bubble {
-    background: var(--bot-bg); border: 1px solid var(--border);
-    border-top-left-radius: 4px; color: var(--text);
-  }
+/* Top bar */
+.topbar {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 20px; animation: fadeDown 0.5s ease both;
+}
 
-  .user .bubble { background: var(--user-bg); border-top-right-radius: 4px; color: white; }
+.logo-mark {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 11px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 11px; color: white;
+  flex-shrink: 0; box-shadow: 0 0 20px rgba(59,130,246,0.25); letter-spacing: -0.5px;
+}
 
-  .bubble a { color: var(--accent); text-decoration: underline; }
-  .user .bubble a { color: #ffe0cc; }
+.topbar-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
+.topbar-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
 
-  .dots { display: flex; gap: 4px; align-items: center; padding: 4px 2px; }
-  .dots span {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent); animation: bounce 1.2s infinite;
-  }
-  .dots span:nth-child(2) { animation-delay: 0.2s; }
-  .dots span:nth-child(3) { animation-delay: 0.4s; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 
-  .suggestions {
-    padding: 4px 22px 18px;
-    display: flex; flex-wrap: wrap; gap: 7px;
-  }
+.ai-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 11px; border-radius: 20px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  font-size: 12px; font-weight: 500; color: var(--text2);
+}
+.ai-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
 
-  .suggestion-label {
-    font-size: 11px; font-weight: 500; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.08em;
-    width: 100%; margin-bottom: 2px;
-  }
+.lang-toggle {
+  display: flex; border: 1px solid var(--border2); border-radius: 10px;
+  overflow: hidden; background: var(--surface2);
+}
+.lang-btn {
+  padding: 6px 12px; font-family: 'Inter', sans-serif; font-size: 12px;
+  font-weight: 500; border: none; cursor: pointer; background: none;
+  color: var(--muted); transition: all 0.2s;
+}
+.lang-btn.active { background: var(--accent); color: white; }
+.lang-btn:hover:not(.active) { color: var(--text2); }
 
-  .suggestion-btn {
-    background: var(--accent-light); border: 1px solid rgba(232,93,4,0.2);
-    color: var(--accent-dark); font-family: 'Inter', sans-serif;
-    font-size: 12.5px; padding: 6px 13px; border-radius: 20px;
-    cursor: pointer; transition: all 0.2s ease;
-  }
+.settings-btn {
+  width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--border2);
+  background: var(--surface2); cursor: pointer; display: flex; align-items: center;
+  justify-content: center; color: var(--muted); font-size: 15px; transition: all 0.2s;
+}
+.settings-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-  .suggestion-btn:hover {
-    background: var(--accent); color: white; border-color: var(--accent);
-    transform: translateY(-1px); box-shadow: 0 3px 10px rgba(232,93,4,0.25);
-  }
+/* ── CHAT APP ── */
+.app {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 24px 60px rgba(0,0,0,0.5);
+  animation: fadeUp 0.5s ease both 0.1s;
+  display: flex; flex-direction: column;
+}
 
-  .input-area {
-    display: flex; align-items: center; gap: 10px;
-    padding: 14px 18px; border-top: 1px solid var(--border); background: #fafaf8;
-  }
+/* Tabs */
+.tabs {
+  display: flex; gap: 4px; padding: 12px 18px 0;
+  border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none;
+  background: var(--surface);
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab-btn {
+  background: none; border: none; padding: 7px 13px;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--muted); cursor: pointer; border-radius: 8px 8px 0 0;
+  white-space: nowrap; transition: all 0.2s;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.tab-btn:hover { color: var(--text2); background: var(--surface2); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(59,130,246,0.08); }
 
-  .input-area input {
-    flex: 1; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px 14px; outline: none;
-    color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px;
-    transition: border-color 0.2s;
-  }
+/* Messages */
+.messages {
+  height: 440px; overflow-y: auto; padding: 22px 20px;
+  display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth;
+  background: var(--bg);
+}
+.messages::-webkit-scrollbar { width: 4px; }
+.messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
-  .input-area input:focus {
-    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,93,4,0.1);
-  }
+.message { display: flex; gap: 10px; animation: msgIn 0.3s ease both; }
+.message.user { flex-direction: row-reverse; }
 
-  .input-area input::placeholder { color: #bbb; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; font-family: 'Syne', sans-serif;
+}
+.bot-avatar {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white; box-shadow: 0 0 12px rgba(59,130,246,0.2);
+}
+.user-avatar { background: #222; color: var(--muted); border: 1px solid var(--border2); }
 
-  .send-btn {
-    width: 40px; height: 40px; border-radius: 10px;
-    background: var(--accent); border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s; flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(232,93,4,0.3);
-  }
+.bubble {
+  max-width: 78%; padding: 11px 15px; border-radius: 14px;
+  font-size: 13.5px; line-height: 1.75;
+}
+.bot .bubble {
+  background: var(--bot-bg); border: 1px solid var(--border);
+  border-top-left-radius: 4px; color: var(--text);
+}
+.user .bubble {
+  background: var(--user-bg); border: 1px solid rgba(59,130,246,0.3);
+  border-top-right-radius: 4px; color: #c7d9ff;
+}
+.bubble a { color: var(--accent); text-decoration: underline; }
+.bubble strong { color: var(--text); font-weight: 600; }
 
-  .send-btn:hover { background: var(--accent-dark); transform: translateY(-1px); }
-  .send-btn svg { width: 16px; height: 16px; fill: white; }
+/* AI streaming cursor */
+.cursor { display: inline-block; width: 2px; height: 14px; background: var(--accent); margin-left: 2px; animation: blink 1s infinite; vertical-align: middle; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
 
-  .footer {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-top: 16px; animation: fadeUp 0.6s ease both 0.2s;
-  }
+/* Typing dots */
+.dots { display: flex; gap: 4px; align-items: center; padding: 3px 2px; }
+.dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: bounce 1.2s infinite; }
+.dots span:nth-child(2) { animation-delay: 0.2s; }
+.dots span:nth-child(3) { animation-delay: 0.4s; }
 
-  .footer-left { font-size: 12px; color: var(--muted); }
-  .footer-left a { color: var(--accent); text-decoration: none; font-weight: 500; }
-  .footer-right { font-size: 12px; color: #bbb; }
+/* Suggestions */
+.suggestions { padding: 10px 18px 12px; display: flex; flex-wrap: wrap; gap: 6px; background: var(--surface); border-top: 1px solid var(--border); }
+.suggestion-btn {
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text2); font-family: 'Inter', sans-serif;
+  font-size: 12px; padding: 5px 12px; border-radius: 20px;
+  cursor: pointer; transition: all 0.2s ease;
+}
+.suggestion-btn:hover { background: rgba(59,130,246,0.12); border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
 
-  .car-search-box { margin-top: 10px; }
-  .car-search-box input {
-    width: 100%; padding: 9px 13px;
-    border: 1px solid var(--border); border-radius: 8px;
-    font-family: 'Inter', sans-serif; font-size: 13px;
-    outline: none; background: white; color: var(--text);
-    transition: border-color 0.2s;
-  }
-  .car-search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,93,4,0.1); }
-  .car-results { margin-top: 8px; max-height: 180px; overflow-y: auto; }
-  .car-results::-webkit-scrollbar { width: 3px; }
-  .car-results::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  .car-result-item {
-    padding: 6px 10px; font-size: 13px; border-radius: 6px;
-    border-bottom: 1px solid #f0ede8; color: var(--text); line-height: 1.4;
-  }
-  .car-result-item:last-child { border-bottom: none; }
-  .car-result-item.match { background: var(--accent-light); color: var(--accent-dark); font-weight: 500; }
-  .car-no-result { font-size: 13px; color: var(--muted); padding: 6px 2px; }
-  .car-loading { font-size: 13px; color: var(--muted); padding: 6px 2px; }
+/* Input area */
+.input-area {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px; border-top: 1px solid var(--border);
+  background: var(--surface);
+}
 
-  @keyframes fadeDown { from { opacity:0; transform:translateY(-14px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes msgIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes bounce { 0%,60%,100% { transform:translateY(0); } 30% { transform:translateY(-5px); } }
-  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+.mode-btns { display: flex; gap: 6px; flex-shrink: 0; }
+
+.mode-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 11px; border-radius: 8px; border: 1px solid var(--border2);
+  background: var(--surface2); cursor: pointer; transition: all 0.2s;
+  font-family: 'Inter', sans-serif; font-size: 11.5px; font-weight: 500;
+  color: var(--muted); white-space: nowrap;
+}
+.mode-btn:hover { border-color: var(--border2); color: var(--text2); }
+.mode-btn.on { background: rgba(59,130,246,0.12); border-color: var(--accent); color: var(--accent); }
+.mode-btn .mdot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.5; }
+.mode-btn.on .mdot { opacity: 1; animation: pulse 2s infinite; }
+
+.input-area input {
+  flex: 1; background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 10px 14px; outline: none;
+  color: var(--text); font-family: 'Inter', sans-serif; font-size: 13.5px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-area input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.input-area input::placeholder { color: var(--muted); }
+
+.send-btn {
+  width: 38px; height: 38px; border-radius: 9px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+}
+.send-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(59,130,246,0.4); }
+.send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.send-btn svg { width: 15px; height: 15px; fill: white; }
+
+/* Status bar */
+.statusbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 18px; background: #0d0d0d; border-top: 1px solid var(--border);
+  font-size: 11px; color: var(--muted);
+}
+.statusbar-left { display: flex; align-items: center; gap: 8px; }
+.status-pill {
+  display: flex; align-items: center; gap: 4px; padding: 2px 8px;
+  border-radius: 10px; background: var(--surface2); border: 1px solid var(--border);
+  font-size: 10.5px;
+}
+.status-pill.ai { color: var(--accent); border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.08); }
+.status-pill.web { color: var(--green); border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.08); }
+
+/* Search results */
+.search-results { margin-top: 8px; }
+.search-result-item {
+  display: block; padding: 8px 10px; margin-bottom: 5px;
+  background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px;
+  text-decoration: none; transition: all 0.2s; color: var(--text);
+}
+.search-result-item:hover { border-color: var(--accent); background: rgba(59,130,246,0.06); transform: translateY(-1px); }
+.search-result-title { font-size: 12.5px; font-weight: 500; color: var(--accent); display: block; }
+.search-result-url { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
+.search-badge {
+  display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 8px;
+  margin-bottom: 6px; font-weight: 600; letter-spacing: 0.05em;
+}
+.badge-strands { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.badge-google { background: rgba(245,158,11,0.15); color: #fbbf24; }
+
+/* Footer */
+.footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 14px; animation: fadeUp 0.5s ease both 0.2s;
+}
+.footer-left { font-size: 11.5px; color: var(--muted); }
+.footer-left a { color: var(--text2); text-decoration: none; }
+.footer-left a:hover { color: var(--accent); }
+.footer-right { font-size: 11px; color: #333; }
+
+@keyframes fadeDown { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes msgIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+@keyframes bounce { 0%,60%,100% { transform:translateY(0); } 30% { transform:translateY(-5px); } }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
 </style>
 </head>
 <body>
+
+<!-- ── SETUP MODAL ── -->
+<div class="setup-overlay" id="setupOverlay">
+  <div class="setup-card">
+    <div class="setup-logo">STR<br>ANDS</div>
+    <h2>Connect Groq AI</h2>
+    <p>Enter your free Groq API key to power this assistant with real AI. Get a key at <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a> — it's free.</p>
+
+    <label class="setup-label">Groq API Key</label>
+    <div class="api-input-wrap">
+      <input type="password" id="apiKeyInput" placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxxxx" />
+      <button class="eye-btn" onclick="toggleEye()" id="eyeBtn">👁</button>
+    </div>
+    <div class="api-hint">
+      Your key is saved for this browser session only and sent exclusively to Groq servers when you chat.
+      <br>⚠️ No connection test is run here — the key will be verified on your first message.
+      <br><a href="https://console.groq.com/keys" target="_blank">→ Get a free API key at console.groq.com</a>
+    </div>
+
+    <label class="setup-label">AI Model</label>
+    <div class="model-select-wrap">
+      <select id="modelSelect">
+        <option value="llama-3.3-70b-versatile">Llama 3.3 70B — Best quality</option>
+        <option value="llama3-8b-8192">Llama 3 8B — Fastest</option>
+        <option value="mixtral-8x7b-32768">Mixtral 8x7B — Balanced</option>
+        <option value="gemma2-9b-it">Gemma 2 9B — Efficient</option>
+      </select>
+    </div>
+
+    <button class="start-btn" id="startBtn" onclick="startApp()">Start Assistant →</button>
+    <div class="setup-error" id="setupError"></div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
 <div class="wrapper">
-  <div class="header">
-    <div class="logo-mark">XBB</div>
-    <div class="header-text">
-      <h1>XBB System Support</h1>
-      <p><span class="status-dot"></span>FAQ Assistant · Always available · No login needed</p>
+  <div class="topbar">
+    <div class="logo-mark">STR<br>ANDS</div>
+    <div>
+      <div class="topbar-title" id="h-title">Strands AI Support</div>
+      <div class="topbar-sub" id="h-sub">Powered by Groq AI · Bilingual · Always available</div>
+    </div>
+    <div class="topbar-right">
+      <div class="ai-badge">
+        <span class="ai-dot"></span>
+        <span id="modelBadge">AI Ready</span>
+      </div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en',this)">🇬🇧</button>
+        <button class="lang-btn" onclick="setLang('sv',this)">🇸🇪</button>
+      </div>
+      <button class="settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
     </div>
   </div>
 
-  <div class="chat-box">
+  <div class="app">
+    <div class="tabs" id="tabs"></div>
     <div class="messages" id="messages"></div>
-
-    <div class="suggestions" id="suggestions">
-      <div class="suggestion-label">Popular questions</div>
-      <button class="suggestion-btn" onclick="ask(this)">Is my car compatible?</button>
-      <button class="suggestion-btn" onclick="ask(this)">Battery drain issue</button>
-      <button class="suggestion-btn" onclick="ask(this)">PowerUnit not found in app</button>
-      <button class="suggestion-btn" onclick="ask(this)">LED bar turns off after 10 seconds</button>
-      <button class="suggestion-btn" onclick="ask(this)">How to update firmware?</button>
-      <button class="suggestion-btn" onclick="ask(this)">Tesla setup</button>
-      <button class="suggestion-btn" onclick="ask(this)">Mercedes MRA2 setup</button>
-      <button class="suggestion-btn" onclick="ask(this)">XBB Dongle not found in app</button>
-    </div>
+    <div class="suggestions" id="suggestions"></div>
 
     <div class="input-area">
-      <input type="text" id="userInput" placeholder="Type your question about XBB..." onkeydown="if(event.key==='Enter') sendMessage()" />
-      <button class="send-btn" onclick="sendMessage()">
+      <div class="mode-btns">
+        <button class="mode-btn" id="aiBtn" onclick="toggleAI()" title="Toggle Groq AI">
+          <span class="mdot"></span> AI
+        </button>
+        <button class="mode-btn" id="webBtn" onclick="toggleWeb()" title="Toggle Web Search">
+          <span class="mdot"></span> Web
+        </button>
+      </div>
+      <input type="text" id="userInput" placeholder="Ask anything about Strands..." onkeydown="if(event.key==='Enter')sendMessage()" />
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
         <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
       </button>
+    </div>
+
+    <div class="statusbar">
+      <div class="statusbar-left" id="statusLeft">
+        <span class="status-pill" id="aiPill">⚡ FAQ mode</span>
+      </div>
+      <span id="statusRight">Strands Support Assistant</span>
     </div>
   </div>
 
   <div class="footer">
-    <div class="footer-left">Content from <a href="https://www.xbb.se/en/faq/" target="_blank">xbb.se/faq</a></div>
-    <div class="footer-right">© Innoware Development AB</div>
+    <div class="footer-left">
+      <a href="https://strandseurope.com" target="_blank">strandseurope.com</a> ·
+      <a href="https://console.groq.com" target="_blank">Groq AI</a>
+    </div>
+    <div class="footer-right">© Strands Group AB</div>
   </div>
 </div>
 
 <script>
-// ── FAQ KNOWLEDGE BASE ─────────────────────────────────────────────────────
-const FAQ = [
-  {
-    keywords: ['compatible', 'work with my car', 'my car', 'car model', 'which car', 'what car', 'support my', 'recipe list', 'does it work', 'supported cars', 'list of cars'],
-    answer: `__CAR_SEARCH__`
+const SP = 'https://strandsab.sharepoint.com/:f:/s/Aftersales/IgCYn40pqzMbRoOqLDUeQriXAVinLQoFqQg17TGDdmvMdu0?e=OumEKT';
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let lang = 'en';
+let aiOn = false;
+let webOn = false;
+let groqKey = '';
+let groqModel = 'llama-3.3-70b-versatile';
+let isSending = false;
+
+// ── SETUP ─────────────────────────────────────────────────────────────────────
+function toggleEye() {
+  const inp = document.getElementById('apiKeyInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+async function startApp() {
+  const key = document.getElementById("apiKeyInput").value.trim();
+  const model = document.getElementById("modelSelect").value;
+
+  if (!key) { showSetupError("Please enter your Groq API key."); return; }
+  if (!key.startsWith("gsk_")) { showSetupError("Invalid key format. Groq keys start with gsk_"); return; }
+  if (key.length < 40) { showSetupError("Key seems too short. Please copy the full key from console.groq.com/keys"); return; }
+
+  groqKey = key;
+  groqModel = model;
+  sessionStorage.setItem("groqKey", key);
+  sessionStorage.setItem("groqModel", model);
+
+  document.getElementById("setupOverlay").classList.add("hidden");
+  document.getElementById("modelBadge").textContent = model.split("-").slice(0,2).join(" ");
+  aiOn = true;
+  updateModes();
+  initApp();
+}
+
+function showSetupError(msg) {
+  const err = document.getElementById('setupError');
+  err.textContent = msg;
+  err.style.display = 'block';
+}
+
+function openSettings() {
+  groqKey = '';
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('setupError').style.display = 'none';
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('startBtn').textContent = 'Start Assistant →';
+  document.getElementById('setupOverlay').classList.remove('hidden');
+}
+
+// ── LANGUAGE ──────────────────────────────────────────────────────────────────
+const UI = {
+  en: {
+    title: 'Strands AI Support',
+    sub: 'Powered by Groq AI · Bilingual · Always available',
+    placeholder: 'Ask anything about Strands...',
+    welcome: `Hi! 👋 I'm the Strands AI assistant powered by Groq.\n\nI can help with:\n• Light technology, ECE, IP ratings, lumen/lux\n• Orders, delivery & returns\n• Warranty & claims\n• CAN bus & XBB installation\n• Product questions\n\n💡 Toggle <strong>AI</strong> mode for smart answers, <strong>Web</strong> for live search results — or use both together!`,
+    tabs: ['All','Tech & Facts','Orders & Delivery','Warranty & Returns','CAN bus & XBB','Products','Contact'],
+    tabKeys: ['all','tech','order','warranty','canbus','product','contact'],
+    fallback: `I couldn't find a specific answer. Here are some resources:\n\n📧 <a href="mailto:support@strands.se">support@strands.se</a>\n📞 +46(0)320-450450\n📁 <a href="${SP}" target="_blank">Aftersales documents →</a>\n🔗 <a href="https://strandseurope.com" target="_blank">strandseurope.com →</a>`,
+    categories: {
+      all: ['What light technology types exist?','What is lumen and lux?','What are ECE regulations?','How long is the warranty?','How do I track my order?','Do I need a CAN bus interface?','What is IP rating?','How do I contact support?','Where are the Aftersales documents?'],
+      tech: ['Light technology types','What is lumen and lux?','What is Kelvin?','Beam patterns explained','ECE regulations','IP rating explained','Relay and fuse sizing'],
+      order: ['Minimum order?','Change my order','Delivery times','Track my order','Express delivery?','Wrong product received','Missing items'],
+      warranty: ['Warranty period','Product broken — claim','Return a product','Warranty with modifications?','Cut the DT connector?','Cut the cable?'],
+      canbus: ['When do I need CAN bus?','Will XBB work with my car?','LED tail light resistors','Car software update & CAN bus','High beam automatics'],
+      product: ['Choose a driving light','No-Glare technology','E-mode vs Xperience mode','Condensation in lamp','Find product manual','Spare parts'],
+      contact: ['Contact support','Become a reseller','Opening hours','Aftersales documents folder']
+    }
   },
-  {
-    keywords: ['recipe', 'create recipe', 'new recipe', 'make recipe', 'book appointment', 'sala'],
-    answer: `XBB continuously adds new recipes, starting with the most popular cars.\n\nTo create a recipe for your specific car:\n• XBB needs physical access to your exact car (with your specific headlight type, gearbox, etc.)\n• It takes about 2 hours to extract the needed data\n• You can book an appointment in Sala via the "Compatible Cars" menu at xbb.se\n\n🔗 <a href="https://www.xbb.se/en/compatible-cars/" target="_blank">Book appointment →</a>`
-  },
-  {
-    keywords: ['battery drain', 'drain', 'draining battery', 'battery', 'bms', 'system_active', 'discharge', 'battery flat'],
-    answer: `Battery drain is usually caused by one of these:\n\n1. Wrong recipe — After locking the car, open the app: SYSTEM_ACTIVE must turn RED within 2 minutes. If it stays green, the recipe isn't compatible → try a different recipe.\n\n2. BMS sensor issue — If your car has a BMS current sensor on the battery and you connected directly to the battery terminals, the car can't detect the extra load and won't charge the battery correctly.\n\nFix: Connect AFTER the BMS sensor:\n• Positive (+) → car fuse box\n• Negative (−) → chassis ground point\n\n🔗 <a href="https://www.xbb.se/en/snabbguide/" target="_blank">Installation manual →</a>`
-  },
-  {
-    keywords: ['powerunit not found', 'powerunit missing', 'cant find powerunit', "can't find powerunit", 'power unit not', 'powerunit disappeared', 'no powerunit', 'powerunit gone'],
-    answer: `XBB PowerUnit not showing in the app? Check these:\n\n1. Wrong wiring — The negative (−) cable MUST go to pin 6 (GND). Hold the PowerUnit with the logo facing you — the LEFT pin is GND.\n🎬 <a href="https://www.youtube.com/watch?v=gKkLxMVfEEk" target="_blank">Watch fix video →</a>\n\n2. After firmware update — Updating the XBB Dongle resets all settings. You must re-add the PowerUnit and re-select the recipe in the app.\n\n3. Manual PowerUnit firmware update — Unplug the Dongle first, then: Main Menu → Update Firmware → select your PowerUnit.\n\n4. Water damage — If the PowerUnit wasn't mounted upright, it may have become water damaged and needs replacing.\n\n5. Missed setup step — Did you actually add the PowerUnit in the app during installation?`
-  },
-  {
-    keywords: ['led bar turns off', 'lights turn off', 'turns off after', '10 seconds', 'overload', 'blocked output', 'too much current', '15 amp', '15a', 'output blocked'],
-    answer: `Your LED bar turning off after ~10 seconds means the output is OVERLOADED.\n\nXBB PowerUnit limits:\n• Output 1 (Pin 8) = max 15 Amps\n• Output 2 (Pin 5) = max 5 Amps\n\nHow to check: Watts ÷ Voltage = Amps\nExample: 250W ÷ 12.7V = 19.7A → exceeds the 15A limit!\n\nSolution: Use an external relay. The PowerUnit activates the relay, the relay powers your lights directly from the battery.\n\n🔗 <a href="https://www.xbb.se/en/kopplingsexempel/" target="_blank">Wiring guide with relay →</a>`
-  },
-  {
-    keywords: ['dongle not found', 'cant find dongle', "can't find dongle", 'dongle missing', 'dongle not visible', 'dongle disappeared', 'dongle not showing'],
-    answer: `XBB Dongle not showing in the app?\n\n• If 10+ minutes passed since closing the app, the Dongle goes into standby. Unplug it from the OBD2 port and plug it back in.\n\n• To keep it always visible: tap ☰ Main Menu (top-left) → "Pair with phone"\n\n• Make sure Location is enabled on your phone — Android requires it for Bluetooth.\n\n• Try toggling Bluetooth off and on.`
-  },
-  {
-    keywords: ['firmware', 'update firmware', 'software update', 'how to update', 'new firmware'],
-    answer: `How to update firmware:\n\nXBB Dongle:\n→ ☰ Main Menu (top-left) → "Update Firmware" → the app checks and offers an update\n\nXBB PowerUnit:\n→ First UNPLUG the XBB Dongle from the OBD2 port\n→ ☰ Main Menu → "Update Firmware" → select your PowerUnit\n\n⚠️ After updating the Dongle, ALL settings are reset. You must:\n1. Re-select your car's recipe\n2. Re-add the XBB PowerUnit in the app`
-  },
-  {
-    keywords: ['tesla', 'model 3', 'model y', 'model s', 'model x', 'tesla dongle', 'tesla cable', 'splitter cable', 'blue connector'],
-    answer: `Tesla setup guide:\n\nModel 3 / Y (built early 2023 or before):\n→ Connect under the rear seat ventilation unit (between front seats). Remove the plastic cover, find the blue connector, use a splitter cable between the two connectors.\n\nModel 3 / Y (Q3 2023 or later):\n→ Blue connector is on the right side of the center console next to the driver's leg. Remove the felt mat. Use a splitter cable.\n\nModel S / X (2012–2021):\n→ Requires the special Tesla Dongle (RED package, not standard blue)\n\n⚠️ Tesla's OBD2 port does NOT provide the needed CAN-bus data — a special connection is always required for Model 3/Y.\n\nXBB does NOT sell the Tesla splitter cable. Find it on Tesla forums or specialist resellers.`
-  },
-  {
-    keywords: ['mercedes', 'mra2', 'w214', 'w206', 'x254', 'glc', 'e-class', 'c-class', 'can-fd', 'pp-can', 'adapter cable'],
-    answer: `Mercedes MRA2 platform (E/C/GLC 2021 onwards — W214, W206, X254):\n\nThese models no longer use CAN-bus through the OBD2 diagnostic port. You must connect to the car's internal CAN-bus network.\n\nOptions:\n1. XBB Dongle + Adapter Cable\n2. PP-CAN-FD product\n\nRequirements:\n• XBB Dongle hardware version 2 (sold since June 2024)\n• Check in app: Settings → About XBB Dongle → must say "XBB-Dongle-2"\n• Technical knowledge of automotive electronics required\n\n🔗 <a href="https://www.xbb.se/en/pp-can-fd/" target="_blank">PP-CAN-FD product →</a>`
-  },
-  {
-    keywords: ['restart', 'standby', 'wake up', 'accelerometer', 'gyro', 'memory loss', 'wont start', "won't start", 'reload recipe', 'reload every time', 'have to restart'],
-    answer: `Your XBB Dongle going into standby is completely normal — it protects your car battery.\n\nInside the Dongle is an accelerometer. Sometimes gentle movements (door closing, engine start) aren't enough to wake it.\n\nFix:\n• Simply drive the car — vibrations will wake it automatically\n• Or gently tap the XBB Dongle with your hand\n\nThis is NOT a fault.`
-  },
-  {
-    keywords: ['delay', 'slow', 'lag', 'takes time', 'not instant', 'late'],
-    answer: `A small delay when activating lights is normal and NOT caused by Bluetooth.\n\nReal causes:\n• Car headlight activation (e.g. Volvo "enhanced high beams" add ~100ms delay)\n• Some LED bars have a built-in startup delay of 100–150ms\n• CAN data reading adds ~10–17ms\n\nTotal typical delay: ~25ms. This is completely normal and barely noticeable during real driving.`
-  },
-  {
-    keywords: ['pixel', 'wrong pin', 'wrong passkey', 'incorrect passkey', 'bluetooth pairing failed', 'pairing error'],
-    answer: `"Wrong PIN" or "Incorrect passkey" on Pixel phones is a known Google bug — NOT an XBB issue.\n\nThe XBB Dongle works on:\n✅ iPhone\n✅ Other Android phones\n❌ Some Pixel phones (Google bug — reported in Google's own support forum)\n\nThere is no fix from XBB's side. Try using a different phone if possible.`
-  },
-  {
-    keywords: ['phone in car', 'phone stay', 'need phone', 'always need phone', 'phone required'],
-    answer: `No, you do NOT need your phone in the car during normal use.\n\nThe phone is only needed for:\n• Initial installation and setup\n• Changing recipes\n• Updating firmware or settings\n\nOnce configured, the system works fully independently — no phone needed.`
-  },
-  {
-    keywords: ['dongle stay', 'remove dongle', 'always plugged', 'leave dongle', 'obd2 port', 'keep dongle'],
-    answer: `Yes, the XBB Dongle MUST remain in the OBD2 port at all times.\n\nIt continuously reads the car's signals (high beam, ignition, etc.) to control the PowerUnit. If removed, the system stops.\n\nIf another device is already in your OBD2 port, use a Y-splitter cable to connect both. Note: XBB cannot guarantee compatibility with other OBD2 devices — must be tested.`
-  },
-  {
-    keywords: ['error code', 'error message', 'fault code', 'warning light', 'workshop error', 'fault light'],
-    answer: `Error codes after installation are usually caused by:\n\n1. Battery disconnected during installation — Very common. Error codes typically disappear after driving a few km. If not, use an OBD2 scanner to clear them.\n\n2. Connected directly to battery negative terminal — Bypasses the BMS sensor causing errors. Fix: ground to chassis instead.\n\n3. Wrong recipe selected — Try a different recipe and verify SYSTEM_ACTIVE turns red after locking the car.`
-  },
-  {
-    keywords: ['lights always on', 'permanently on', 'stays on', 'never turns off', 'constantly on', 'always lit'],
-    answer: `Lights always on means the cables are swapped.\n\nFix: The positive (+) cable from the battery MUST connect to PIN 2 on the XBB PowerUnit. Double-check your wiring.\n\n🔗 <a href="https://www.xbb.se/en/kopplingsexempel/" target="_blank">Wiring guide →</a>`
-  },
-  {
-    keywords: ['lights after service', 'workshop', 'mechanic', 'service visit', 'stopped working after', 'after garage'],
-    answer: `Two likely causes after a workshop visit:\n\n1. Dongle removed — The mechanic unplugged your XBB Dongle to read error codes and forgot to reinsert it. Simply plug it back in — it works again within seconds.\n\n2. Car software update — Workshops sometimes update car software which can affect XBB recipes. Try updating to the latest recipe in the app. If that fails, contact XBB support.\n\n🔗 <a href="https://www.xbb.se/en/help/" target="_blank">Contact XBB support →</a>`
-  },
-  {
-    keywords: ['12v when off', '12 volt output', 'voltage output', 'measuring output', 'multimeter', 'shows voltage'],
-    answer: `Measuring ~12V on the PowerUnit outputs when they're not activated is completely normal and intentional.\n\nThis allows the XBB PowerUnit to detect short circuits on the outputs. It's by design — not a fault.`
-  },
-  {
-    keywords: ['smart button', 'xbb button', 'push button', 'wireless button', 'add button', 'smart button setup'],
-    answer: `How to add an XBB Smart Button:\n\n1. Make sure you already have an XBB PowerUnit added in the app\n2. Go to the PowerUnit tab\n3. Tap the + button → select "Add XBB Button"\n4. Follow the on-screen instructions\n5. Go to button settings to configure single/double press actions\n\nPerfect for manually toggling your LED bar on/off (e.g. in snow or summer).`
-  },
-  {
-    keywords: ['turn off led', 'disable lights', 'snow', 'summer', 'switch off manually', 'turn off bar'],
-    answer: `Two ways to manually turn off your LED bar:\n\n1. XBB Smart Button — Add a wireless button to toggle outputs on/off anytime.\n\n2. Remove the Dongle — Turn off ignition first, then unplug the XBB Dongle. System shuts off. Reinserting restores everything within seconds.`
-  },
-  {
-    keywords: ['connect power', 'where to connect', 'fuse box', 'positive cable', 'negative cable', 'ground', 'wiring', 'how to wire'],
-    answer: `How to connect the XBB PowerUnit to your car:\n\n✅ Recommended:\n• Positive (+) → car fuse box (connected AFTER the BMS sensor)\n• Negative (−) → chassis ground point (NOT the battery negative terminal)\n\n⚠️ If your car has a BMS sensor, connecting directly to the battery terminal bypasses it — the car won't detect the extra load and the battery may drain.\n\n🔗 <a href="https://www.xbb.se/en/kopplingsexempel/" target="_blank">Full wiring guide →</a>`
-  },
-  {
-    keywords: ['signal', 'app signal', 'highbeam signal', 'system_active', 'low_batt', 'voltage signal', 'what does signal mean', 'signal meaning'],
-    answer: `Signal meanings in the XBB Configurator app:\n\n🟢 HIGHBEAM — High beam is active\n🟢 LOWBEAM — Low beam is active\n🟢 REVERSELIGHT — Reverse light is active\n🟢 IGNITION — Ignition is on\n🟢/🔴 SYSTEM_ACTIVE — Green = active. Must turn RED within 2 min of locking car. If it stays green → wrong recipe!\n🟢 LOW_BATT — Battery too low. Charge battery or start the engine.\n📊 VOLTAGE — Battery voltage (e.g. "127" = 12.7V)`
-  },
-  {
-    keywords: ['headlight type', 'what headlight', 'halogen', 'led headlight', 'xenon', 'matrix', 'adaptive'],
-    answer: `Not sure what headlights your car has?\n\n• Contact your brand's authorized workshop — they can look it up\n• Visit <a href="https://www.car.info/" target="_blank">car.info</a> and search your car model\n\nNote: XBB works with LED Matrix / Auto Dimming headlights if the recipe supports adaptive high beam. Very powerful auxiliary lights may still trigger the car's auto-dimming system.`
-  },
-  {
-    keywords: ['volvo', 'obd2 port', 'hard to insert', 'tight fit', 'wont fit', "won't fit", 'volvo port', 'volvo dongle'],
-    answer: `Volvo's OBD2 port is tighter than most brands, making the XBB Dongle harder to insert.\n\nGood news: Dongles manufactured after May 1, 2022 have a better-fitting connector designed for Volvo's port.\n\nOlder Dongles are stiff but do fit and work correctly — just push firmly.`
-  },
-  {
-    keywords: ['flashing', 'flickering', 'flickers', 'sometimes flashes', 'intermittent', 'random flash'],
-    answer: `Lights flickering occasionally is usually a recipe issue.\n\nFix:\n1. Delete your current recipe in the app\n2. Reinstall the recipe fresh\n3. Check if a newer version of your car's recipe is available\n\nXBB constantly updates recipes — a newer version may have fixed this.`
-  },
-  {
-    keywords: ['install', 'installation', 'how to install', 'setup', 'set up', 'manual', 'quick guide', 'getting started'],
-    answer: `Installation resources:\n\n📖 <a href="https://www.xbb.se/en/snabbguide/" target="_blank">Quick Start Manual →</a>\n🎬 <a href="https://youtu.be/KBsbvsVQm0s" target="_blank">Installation Video →</a>\n🔌 <a href="https://www.xbb.se/en/kopplingsexempel/" target="_blank">Wiring Guide →</a>\n\nKey steps:\n1. Download XBB Configurator app\n2. Plug Dongle into OBD2 port\n3. Pair in the app and select your car's recipe\n4. Check SYSTEM_ACTIVE turns red 2 min after locking\n5. Add XBB PowerUnit in the app\n6. Wire PowerUnit to your lighting`
-  },
-  {
-    keywords: ['support', 'contact', 'help', 'problem', 'issue', 'not working', 'broken', 'still not working'],
-    answer: `Need more help? Here are your options:\n\n🔧 <a href="https://www.xbb.se/en/help/" target="_blank">XBB Support Form →</a>\n📖 <a href="https://www.xbb.se/en/snabbguide/" target="_blank">Installation Manual →</a>\n🎬 <a href="https://www.xbb.se/en/filmer/" target="_blank">Video guides →</a>\n❓ <a href="https://www.xbb.se/en/faq/" target="_blank">Full FAQ →</a>\n🏪 <a href="https://www.xbb.se/en/dealers/" target="_blank">Find a reseller →</a>`
+  sv: {
+    title: 'Strands AI Support',
+    sub: 'Drivs av Groq AI · Tvåspråkig · Alltid tillgänglig',
+    placeholder: 'Fråga något om Strands...',
+    welcome: `Hej! 👋 Jag är Strands AI-assistent driven av Groq.\n\nJag kan hjälpa med:\n• Ljusteknik, ECE, IP-klass, lumen/lux\n• Order, leverans & retur\n• Garanti & reklamation\n• CAN bus & XBB-installation\n• Produktfrågor\n\n💡 Aktivera <strong>AI</strong>-läge för smarta svar, <strong>Webb</strong> för live-sökresultat — eller använd båda!`,
+    tabs: ['Alla','Teknik & fakta','Order & leverans','Garanti & retur','CAN bus & XBB','Produkter','Kontakt'],
+    tabKeys: ['all','tech','order','warranty','canbus','product','contact'],
+    fallback: `Jag hittade inget specifikt svar. Här är några resurser:\n\n📧 <a href="mailto:support@strands.se">support@strands.se</a>\n📞 +46(0)320-450450\n📁 <a href="${SP}" target="_blank">Aftersales-dokument →</a>\n🔗 <a href="https://strandseurope.com" target="_blank">strandseurope.com →</a>`,
+    categories: {
+      all: ['Vilka ljustekniker finns?','Vad är lumen och lux?','Vad är ECE-reglerna?','Hur lång är garantin?','Hur spårar jag min order?','Behöver jag CAN bus-interface?','Vad är IP-klassning?','Hur kontaktar jag support?','Var finns Aftersales-dokument?'],
+      tech: ['Ljustekniker','Lumen och lux','Vad är Kelvin?','Ljusbilder förklarade','ECE-reglerna','IP-klassning','Relä och säkring'],
+      order: ['Minsta ordergräns?','Ändra beställning','Leveranstid','Spåra min order','Expressfrakt?','Fått fel vara','Saknas varor'],
+      warranty: ['Garantitid','Produkt gått sönder','Returnera produkt','Garanti vid modifiering?','Klippa DT-kontakten?','Klippa kabeln?'],
+      canbus: ['När behövs CAN bus?','Fungerar XBB med min bil?','LED-bakljus motstånd','Biluppdatering & CAN bus','Helljusautomatik'],
+      product: ['Välja extraljus','No-Glare-tekniken','E-läge vs Xperience','Kondens i lampa','Hitta manual','Reservdelar'],
+      contact: ['Kontakta support','Bli återförsäljare','Öppettider','Aftersales-dokumentmapp']
+    }
   }
+};
+
+// ── FAQ KNOWLEDGE BASE ────────────────────────────────────────────────────────
+const FAQ = [
+  { cat:'tech', keywords:{en:['light technology','halogen','xenon','led','types of lights'],sv:['ljusteknik','halogen','xenon','led','ljustekniker']},
+    answer:{en:`The most common types are halogen, xenon, and LED:\n\n💡 Halogen — Filament + halogen gas. Bright but shorter lifespan than LED/xenon. Generates heat.\n💡 Xenon — Xenon gas, no filament. Longer lifespan, lower consumption. Slow startup.\n💡 LED — Most common in Strands products. Very long lifespan, low power, instant on, vibration-resistant.\n\n🔗 <a href="https://strands.se/kunskapsbank/valj-ratt-extraljus-den-ultimata-guiden/" target="_blank">Knowledge bank →</a>`,
+    sv:`De vanligaste teknikerna är halogen, xenon och LED:\n\n💡 Halogen — Glödtråd + halogengas. Stark men kortare livslängd. Hög värmeutveckling.\n💡 Xenon — Xenongas, ingen glödtråd. Lång livslängd, låg förbrukning. Långsam uppstartning.\n💡 LED — Vanligast i Strands sortiment. Mycket lång livslängd, låg förbrukning, omedelbar tändning.\n\n🔗 <a href="https://strands.se/kunskapsbank/valj-ratt-extraljus-den-ultimata-guiden/" target="_blank">Kunskapsbank →</a>`}},
+  { cat:'tech', keywords:{en:['lumen','lux','brightness','intensity','luminous'],sv:['lumen','lux','ljusstyrka','intensitet']},
+    answer:{en:`📏 Lumen — Luminous flux from a light source (actual strength). Strands always uses actual lumens, not theoretical.\n📏 Lux — Illuminance on a surface. 1 lux = 1 lumen/m². Driving lights are rated as "1 lux @ X meters".\n\n🔬 All Strands lights are measured in our own advanced light laboratory.`,
+    sv:`📏 Lumen — Ljusflödet från en ljuskälla (faktisk styrka). Strands anger alltid faktiska lumen.\n📏 Lux — Luminansen på en yta. 1 lux = 1 lumen/m². Extraljus anges som "1 lux @ X meter".\n\n🔬 Alla Strands-lampor mäts i vårt avancerade ljuslaboratorium.`}},
+  { cat:'tech', keywords:{en:['kelvin','color temperature','warm','cool'],sv:['kelvin','färgtemperatur','varm','kall']},
+    answer:{en:`Higher Kelvin = cooler/bluer light. Lower Kelvin = warmer/redder.\n\nFor driving & work lights: cooler temperature (higher K) gives a clearer beam.\nFor rain/snow: warmer temperature reduces glare from water particles.`,
+    sv:`Högre Kelvin = kallare/blåare ljus. Lägre Kelvin = varmare/rödare.\n\nFör extra- och arbetsljus: kallare temperatur (högre K) ger en klarare ljusbild.\nVid regn/snö: varmare temperatur minskar reflexer från vattenpartiklar.`}},
+  { cat:'tech', keywords:{en:['beam pattern','flood','combo','pencil','optimized','extended','long-distance'],sv:['ljusbild','flood','combo','pencil','optimized','extended']},
+    answer:{en:`🔦 Optimized (Flood) — Widest beam. Best for winding roads, spots animals on the sides.\n🔦 Extended (Combo) — Width + distance combined. Versatile all-rounder.\n🔦 Long-distance (Pencil) — Narrow, maximum range. Best for highways and mountain roads.`,
+    sv:`🔦 Optimized (Flood) — Bredast. Bäst för kurviga vägar, ser djur längs kanten.\n🔦 Extended (Combo) — Kombination bredd + räckvidd. Mångsidig.\n🔦 Long-distance (Pencil) — Smal, maximal räckvidd. Bäst för motorvägar och fjällvägar.`}},
+  { cat:'tech', keywords:{en:['ece','e-approved','regulations','legal','road legal'],sv:['ece','e-godkänt','reglemente','laglig']},
+    answer:{en:`ECE regulations govern vehicle lighting — which lights are allowed, their intensity, and how they're installed.\n\nKey points:\n• Driving lights must not be too powerful\n• Placement and quantity rules apply\n• Many Strands lights have E-mode (road legal) and Xperience mode\n• ECE R112 = Halogen & LED headlamps; ECE R87 = DRL; ECE R91 = Side markers`,
+    sv:`ECE-reglementet reglerar fordonsbelysning — vilka lampor som tillåts, deras intensitet och hur de monteras.\n\nViktigt:\n• Extraljus får inte vara för starka\n• Regler för antal och placering gäller\n• Många Strands-lampor har E-läge (lagligt) och Xperience-läge\n• ECE R112 = Halogen/LED-strålkastare; ECE R87 = Varselljus; ECE R91 = Sidomarkeringsljus`}},
+  { cat:'tech', keywords:{en:['ip rating','ip class','waterproof','dustproof'],sv:['ip-klassning','ip-klass','vattentät','dammtät']},
+    answer:{en:`IP rating = protection against solids (1st digit) and water (2nd digit).\n\nFirst digit: 5=dust protected, 6=dust-tight\nSecond digit: 5=water jets, 6=powerful jets, 7=temporary submersion, 8=continuous, 9K=high pressure/temp\n\nExample: IP66 = dust-tight + powerful water jets.`,
+    sv:`IP-klassning = skydd mot fasta ämnen (1:a siffran) och vatten (2:a siffran).\n\n1:a siffran: 5=dammskyddad, 6=dammtät\n2:a siffran: 5=vattenstråle, 6=kraftig spolning, 7=tillfällig nedsänkning, 8=långvarig, 9K=högtryck/varmvatten\n\nExempel: IP66 = dammtät + kraftig vattenspolning.`}},
+  { cat:'tech', keywords:{en:['relay','fuse','cable','amp','ampere','wire'],sv:['relä','säkring','kabel','ampere']},
+    answer:{en:`• Relay: ≥10% above max load, higher amps than fuse\n• Fuse: Just above total max load — always the weakest link so it fails first\n• Cable cross-section: Depends on load, length, material — no universal answer\n\n⚠️ If unsure, consult a vehicle electrician.`,
+    sv:`• Relä: ≥10% över maxeffekten, högre ampere än säkringen\n• Säkring: Strax över total maxeffekt — alltid svagaste länken\n• Kabelarea: Beror på effekt, längd, material — inget generellt svar\n\n⚠️ Är du osäker, anlita en fordonselektriker.`}},
+  // ORDER
+  { cat:'order', keywords:{en:['minimum order','order limit'],sv:['minsta order','ordergräns']},
+    answer:{en:`No minimum order at Strands. Order as little or as much as you need! 🛒`,sv:`Ingen minsta ordergräns hos Strands. Beställ hur lite eller mycket du vill! 🛒`}},
+  { cat:'order', keywords:{en:['change order','modify order','cancel order'],sv:['ändra beställning','ändra order','avboka']},
+    answer:{en:`Orders are processed promptly — no changes once confirmed (incl. delivery address).\nIf not yet confirmed: 📞 +46(0)320-450450 (08:00–17:00 business days)`,
+    sv:`Beställningar behandlas omgående — inga ändringar efter bekräftelse (inkl. leveransadress).\nOm ej bekräftad: 📞 +46(0)320-450450 (08:00–17:00 vardagar)`}},
+  { cat:'order', keywords:{en:['track order','tracking','where is my order'],sv:['spåra beställning','spåra paket','var är mitt']},
+    answer:{en:`You'll receive a tracking email once your order is shipped. Also available via the PostNord app.`,
+    sv:`Du får ett spårnings-mejl när din beställning skickats. Du kan också följa det via PostNords app.`}},
+  { cat:'order', keywords:{en:['express delivery','express shipping','fast delivery'],sv:['expressfrakt','snabb leverans']},
+    answer:{en:`Strands does not offer express delivery. We ship via PostNord (no express option).`,sv:`Strands erbjuder ingen expressfrakt. Vi skickar via PostNord (ingen expressoption).`}},
+  { cat:'order', keywords:{en:['delivery time','how long','shipping time'],sv:['leveranstid','hur lång','när kommer']},
+    answer:{en:`🇸🇪 Sweden: ~1–4 business days.\n🌍 International: Contact support@strands.se for estimate.`,
+    sv:`🇸🇪 Sverige: ~1–4 vardagar.\n🌍 Utomlands: Kontakta support@strands.se för uppskattning.`}},
+  { cat:'order', keywords:{en:['missing item','items missing'],sv:['saknas varor','varor saknas']},
+    answer:{en:`Missing items may be on backorder or a picking error occurred.\n📧 support@strands.se · 📞 +46(0)320-450450`,
+    sv:`Saknade varor kan vara restnoterade eller ett plockfel har skett.\n📧 support@strands.se · 📞 +46(0)320-450450`}},
+  { cat:'order', keywords:{en:['wrong product','wrong item','received wrong'],sv:['fel vara','fel produkt','fick fel']},
+    answer:{en:`We apologize! Contact us and we'll assist promptly:\n📧 support@strands.se · 📞 +46(0)320-450450`,
+    sv:`Vi beklagar! Kontakta oss så hjälper vi dig direkt:\n📧 support@strands.se · 📞 +46(0)320-450450`}},
+  { cat:'order', keywords:{en:['reseller','become reseller','retailer'],sv:['återförsäljare','bli återförsäljare']},
+    answer:{en:`Interested in becoming a Strands reseller?\n📧 order@strands.se\n🔗 <a href="https://strandseurope.com/sv/become-a-retailer" target="_blank">Fill in the form →</a>`,
+    sv:`Intresserad av att bli återförsäljare?\n📧 order@strands.se\n🔗 <a href="https://strandseurope.com/sv/become-a-retailer" target="_blank">Fyll i formuläret →</a>`}},
+  // WARRANTY
+  { cat:'warranty', keywords:{en:['warranty','guarantee','warranty period'],sv:['garanti','garantitid','garantiperiod']},
+    answer:{en:`SLD products: 3–6 year warranty. Other ranges: typically 1 year.\nCovers manufacturing defects only — NOT incorrect use or installation.\n🔗 <a href="https://strandseurope.com/sv/about-us/function-warranty" target="_blank">Full warranty terms →</a>\n📁 <a href="${SP}" target="_blank">Aftersales documents →</a>`,
+    sv:`SLD-produkter: 3–6 år garanti. Övriga: normalt 1 år.\nTäcker tillverkningsfel — INTE felaktig användning.\n🔗 <a href="https://strandseurope.com/sv/about-us/function-warranty" target="_blank">Garantivillkor →</a>\n📁 <a href="${SP}" target="_blank">Aftersales-dokument →</a>`}},
+  { cat:'warranty', keywords:{en:['product broken','stopped working','warranty claim','make a claim'],sv:['produkt gått sönder','slutat fungera','reklamation']},
+    answer:{en:`Product broken?\n• Bought from retailer → contact retailer\n• Direct claim: 📧 reklamation@strands.se\n🔗 <a href="https://strandseurope.com/sv/contact/claims-and-returns" target="_blank">Claims & returns →</a>\n📁 <a href="${SP}" target="_blank">Aftersales documents →</a>`,
+    sv:`Produkt gått sönder?\n• Köpt från återförsäljare → kontakta återförsäljaren\n• Direkt: 📧 reklamation@strands.se\n🔗 <a href="https://strandseurope.com/sv/contact/claims-and-returns" target="_blank">Reklamation & retur →</a>\n📁 <a href="${SP}" target="_blank">Aftersales-dokument →</a>`}},
+  { cat:'warranty', keywords:{en:['return','regret','cancel','right of withdrawal'],sv:['retur','ångra','returnera','ångervrätt']},
+    answer:{en:`Right of withdrawal doesn't apply to B2B. However Strands is solution-oriented — contact us early:\n📧 support@strands.se\n🔗 <a href="https://strandseurope.com/sv/contact/claims-and-returns" target="_blank">Returns page →</a>`,
+    sv:`Ångerrätten gäller inte B2B. Strands är dock lösningsorienterade — kontakta oss tidigt:\n📧 support@strands.se\n🔗 <a href="https://strandseurope.com/sv/contact/claims-and-returns" target="_blank">Retursida →</a>`}},
+  { cat:'warranty', keywords:{en:['cut dt connector','dt connector'],sv:['klippa dt-kontakt','dt-kontakt']},
+    answer:{en:`No, warranty is VOID if you cut the DT connector.\n🔗 <a href="https://strandseurope.com/sv/about-us/function-warranty" target="_blank">Warranty terms →</a>`,
+    sv:`Nej, garantin UPPHÖR om du klipper DT-kontakten.\n🔗 <a href="https://strandseurope.com/sv/about-us/function-warranty" target="_blank">Garantivillkor →</a>`}},
+  { cat:'warranty', keywords:{en:['cut cable','shorten cable'],sv:['klippa kabeln','korta kabeln']},
+    answer:{en:`Warranty void if cable is cut shorter than 50 cm.\n🔗 <a href="https://strandseurope.com/sv/about-us/function-warranty" target="_blank">Warranty terms →</a>`,
+    sv:`Garantin gäller inte om kabeln klipps kortare än 50 cm.\n🔗 <a href="https://strandseurope.com/sv/about-us/function-warranty" target="_blank">Garantivillkor →</a>`}},
+  { cat:'warranty', keywords:{en:['modify','disassemble','open','modification'],sv:['modifiera','öppna','demontera','modifiering']},
+    answer:{en:`Modifying = warranty void. Opening a sealed product (LED bar etc.) = warranty void. Opening products designed to be opened (halogen lamp for bulb change) = warranty maintained.`,
+    sv:`Modifiering = garantin upphör. Öppna förseglad produkt (LED-bar m.m.) = garantin upphör. Öppna produkter avsedda att öppnas (halogen för byte av glödlampa) = garantin gäller.`}},
+  // CAN BUS
+  { cat:'canbus', keywords:{en:['canbus interface','can bus','270417','when do i need'],sv:['canbus interface','can bus','270417','när behövs']},
+    answer:{en:`You need a CAN bus interface (270417) when you want driving lights to activate with the high beam AND your vehicle only delivers a current pulse (not constant power) to the high beam. Mainly applies to xenon or LED headlamp vehicles.`,
+    sv:`Du behöver Canbus Interface (270417) när du vill att extraljuset ska aktiveras med helljuset OCH bilen bara ger en strömimpuls (inte konstant ström) till helljuset. Gäller främst bilar med xenon- eller LED-strålkastare.`}},
+  { cat:'canbus', keywords:{en:['high beam automatic','adaptive high beam'],sv:['helljusautomatik','adaptivt helljus']},
+    answer:{en:`Adaptive/automatic high beam does NOT work with the CAN bus interface (270417). Manual high beam still works.`,
+    sv:`Helljusautomatik fungerar INTE med Canbus Interface (270417). Manuellt helljus fungerar fortfarande.`}},
+  { cat:'canbus', keywords:{en:['software update','car update'],sv:['mjukvaruuppdatering','biluppdatering']},
+    answer:{en:`After a car software update the CAN bus interface may stop working (new signals). It needs updating through Nitor. If over 12 months old, it may need replacing.`,
+    sv:`Efter en biluppdatering kan Canbus-interfacet sluta fungera (nya signaler). Det behöver uppdateras via Nitor. Om det är äldre än 12 månader kan det behöva bytas.`}},
+  { cat:'canbus', keywords:{en:['resistor','led taillights','tail light'],sv:['motstånd','led-bakljus','bakljus']},
+    answer:{en:`Some cars work fine with LED taillights, others need a resistor. 💡 Try without resistor first — add one if needed.`,
+    sv:`Vissa bilar fungerar fint, andra behöver motstånd. 💡 Prova utan motstånd först — köp ett om det inte fungerar.`}},
+  { cat:'canbus', keywords:{en:['xbb dongle','will xbb work','obd port locked','pp-can'],sv:['xbb dongle','fungerar xbb','obd port låst','pp-can']},
+    answer:{en:`Will XBB work with your car? Probably yes — check two things:\n1. Recipe list: <a href="https://www.xbb.se/xbbTable/bilmodeller.php" target="_blank">compatible cars →</a>\n2. OBD port: Some newer cars (Volvo post-2017, certain Mercedes/VAG) have a Secure Gateway.\n\n• Open OBD: Kit 270425 + wiring 907003\n• Locked OBD: PP-CAN + wiring 907051/907052\n• No OBD: PP-CAN-FD\n\n📧 Send your reg. number to support@strands.se for confirmation.`,
+    sv:`Fungerar XBB med din bil? Förmodligen ja — kolla två saker:\n1. Receptlista: <a href="https://www.xbb.se/xbbTable/bilmodeller.php" target="_blank">kompatibla bilar →</a>\n2. OBD-port: Nyare bilar (Volvo efter 2017, vissa Mercedes/VAG) kan ha Secure Gateway.\n\n• Öppen OBD: Kit 270425 + kablage 907003\n• Låst OBD: PP-CAN + kablage 907051/907052\n• Ingen OBD: PP-CAN-FD\n\n📧 Skicka ditt reg.nr till support@strands.se för bekräftelse.`}},
+  // PRODUCTS
+  { cat:'product', keywords:{en:['which light','choose driving light','what light for'],sv:['vilket extraljus','välja ljus','vilket ljus']},
+    answer:{en:`🚛 Large car/truck → 9" driving light or large LED bar\n🚐 LCV/car → 7" driving light or slim LED bar\n\nBeam: Long straight roads → pencil/long-distance. Winding roads → flood/optimized.\n\n🔗 <a href="https://strandseurope.com" target="_blank">Browse products →</a>`,
+    sv:`🚛 Stor bil/lastbil → 9" extraljus eller stor LED-bar\n🚐 Lätt lastbil/bil → 7" extraljus eller smal LED-bar\n\nLjusbild: Raka vägar → pencil/long-distance. Kurviga vägar → flood/optimized.\n\n🔗 <a href="https://strandseurope.com" target="_blank">Hitta produkter →</a>`}},
+  { cat:'product', keywords:{en:['no-glare','noglare','for9t'],sv:['no-glare','for9t','bländfri']},
+    answer:{en:`No-Glare (FOR9T): Unique lens divides beam — stronger at bottom, diffused higher up. Less blinding, focused exactly where needed.`,
+    sv:`No-Glare (FOR9T): Unik lins delar strålen — starkare nedtill, diffust uppåt. Mindre bländande, fokuserat precis där det behövs.`}},
+  { cat:'product', keywords:{en:['e-mode','xperience mode','two modes'],sv:['e-läge','xperience-läge','e-mode']},
+    answer:{en:`✅ E-mode — Road legal, E-approved. Good for rain/snow (less glare).\n⚡ Xperience mode — Maximum power. Best luminosity & range for dark conditions.`,
+    sv:`✅ E-läge — Lagligt, E-godkänt. Bra vid regn/snö (mindre reflexer).\n⚡ Xperience-läge — Maximal effekt. Bästa ljusstyrka & räckvidd i mörker.`}},
+  { cat:'product', keywords:{en:['condensation','moisture','water inside lamp'],sv:['kondens','fukt','vatten i lampa']},
+    answer:{en:`Condensation inside is normal (humidity + temperature changes). Most lights have a breather vent — moisture dissipates when you use the lamp. No action needed.`,
+    sv:`Kondens inuti är normalt (luftfuktighet + temperaturväxlingar). De flesta lampor har andningshål — fukten försvinner när du använder lampan. Ingen åtgärd krävs.`}},
+  { cat:'product', keywords:{en:['manual','instruction','find manual'],sv:['manual','instruktion','hitta manual']},
+    answer:{en:`Find manuals on the product page at strandseurope.com.\n\nCan't find it? 📧 support@strands.se\n📁 <a href="${SP}" target="_blank">Aftersales documents folder →</a>`,
+    sv:`Hitta manualer på produktsidan på strandseurope.com.\n\nHittar du den inte? 📧 support@strands.se\n📁 <a href="${SP}" target="_blank">Aftersales-dokumentmapp →</a>`}},
+  { cat:'product', keywords:{en:['spare parts','replacement parts'],sv:['reservdelar','ersättningsdelar']},
+    answer:{en:`Sometimes Strands can provide spare parts.\n📧 support@strands.se\n🔗 <a href="https://strandseurope.com/sv/kategorier/monteringstillbehor/fasten" target="_blank">Mounting accessories →</a>`,
+    sv:`Strands kan i vissa fall erbjuda reservdelar.\n📧 support@strands.se\n🔗 <a href="https://strandseurope.com/sv/kategorier/monteringstillbehor/fasten" target="_blank">Monteringstillbehör →</a>`}},
+  // CONTACT
+  { cat:'contact', keywords:{en:['contact','support','phone','email','customer service','opening hours'],sv:['kontakt','support','telefon','mejl','kundservice','öppettider']},
+    answer:{en:`📞 +46(0)320-450450\n📧 Customer service: order@strands.se\n📧 Technical support: support@strands.se\n📧 Warranty claims: reklamation@strands.se\n\n🕐 08:00–17:00 business days (24h email response)\n\n🏢 Strands Group AB, Hagalundsvägen, 51172 Fritsla, Sweden\n📁 <a href="${SP}" target="_blank">Aftersales documents folder →</a>`,
+    sv:`📞 +46(0)320-450450\n📧 Kundservice: order@strands.se\n📧 Teknisk support: support@strands.se\n📧 Reklamation: reklamation@strands.se\n\n🕐 08:00–17:00 vardagar (24h mejlsvar)\n\n🏢 Strands Group AB, Hagalundsvägen, 51172 Fritsla, Sverige\n📁 <a href="${SP}" target="_blank">Aftersales-dokumentmapp →</a>`}},
+  { cat:'contact', keywords:{en:['document','documents','download','file','sharepoint','aftersales folder'],sv:['dokument','ladda ner','fil','mapp','sharepoint','aftersales']},
+    answer:{en:`Access all Aftersales documents (manuals, warranty terms, return forms):\n\n📁 <a href="${SP}" target="_blank">Open Aftersales documents folder →</a>\n\n⚠️ You need to be logged in with your Strands Microsoft 365 account.`,
+    sv:`Tillgång till alla Aftersales-dokument (manualer, garantivillkor, returformulär):\n\n📁 <a href="${SP}" target="_blank">Öppna Aftersales-dokumentmapp →</a>\n\n⚠️ Du behöver vara inloggad med ditt Strands Microsoft 365-konto.`}}
 ];
 
-// ── LIVE RECIPE LIST ──────────────────────────────────────────────────────────
-let recipeList = [];
-let recipeLoaded = false;
+// ── GROQ SYSTEM PROMPT ────────────────────────────────────────────────────────
+const SYSTEM_PROMPT = `You are the official Strands AI support assistant for Strands Group AB, a Swedish company specializing in professional vehicle lighting (LED bars, driving lights, work lights).
 
-async function loadRecipes() {
-  try {
-    // Try fetching via CORS proxy
-    const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://recipelist.innowareapi.com/');
-    const res = await fetch(proxyUrl);
-    const json = await res.json();
-    const html = json.contents;
+Answer in the same language the user writes in (Swedish or English). Be concise, helpful, and professional. Use bullet points for clarity when listing steps or options.
 
-    // Parse all text content that looks like car names
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
+Key knowledge:
+- Products: LED bars, driving lights, work lights, side markers, warning lights, CAN bus interfaces, XBB system
+- Technology: lumen, lux, Kelvin, IP rating, ECE regulations, beam patterns (flood/combo/pencil)
+- ECE: E-approval required for road-legal use. Many Strands lights have E-mode (legal) and Xperience mode (max power)
+- Warranty: SLD products 3-6 years, others typically 1 year. Void if: DT connector cut, cable cut under 50cm, product modified/disassembled without permission
+- Orders: No minimum, PostNord shipping, Sweden 1-4 business days, no express
+- CAN bus: Interface 270417 needed when car delivers only current pulse to high beam (not constant). XBB Dongle works via OBD2 port, but some newer cars (Volvo post-2017, Mercedes MRA2, newer VAG) need PP-CAN solution
+- Contacts: support@strands.se, order@strands.se, reklamation@strands.se, phone +46(0)320-450450, open 08:00-17:00 weekdays
+- SharePoint Aftersales documents: ${SP}
+- Website: strandseurope.com
 
-    // Try table rows first
-    const rows = doc.querySelectorAll('tr, li, .recipe, .car, [class*="car"], [class*="model"]');
-    const items = new Set();
+Always be helpful and accurate. If unsure, direct to support@strands.se.`;
 
-    rows.forEach(row => {
-      const text = row.textContent.trim();
-      if (text.length > 3 && text.length < 120 && !text.includes('{') && !text.includes('function')) {
-        items.add(text);
-      }
-    });
-
-    // Also grab all text nodes that look like car names
-    const allText = doc.body ? doc.body.innerText || doc.body.textContent : '';
-    const lines = allText.split('\n').map(l => l.trim()).filter(l =>
-      l.length > 3 && l.length < 100 &&
-      !l.includes('{') && !l.includes('function') && !l.includes('var ') &&
-      !l.includes('http') && !l.startsWith('//')
-    );
-    lines.forEach(l => items.add(l));
-
-    recipeList = [...items].filter(Boolean);
-    recipeLoaded = recipeList.length > 5;
-  } catch(e) {
-    recipeLoaded = false;
-  }
-}
-
-function renderCarSearch() {
-  const id = 'car-search-' + Date.now();
-  const resultsId = 'car-results-' + Date.now();
-
-  setTimeout(() => {
-    const input = document.getElementById(id);
-    const results = document.getElementById(resultsId);
-    if (!input || !results) return;
-
-    input.addEventListener('input', () => {
-      const q = input.value.trim().toLowerCase();
-      results.innerHTML = '';
-      if (!q) return;
-
-      if (!recipeLoaded) {
-        results.innerHTML = `<div class="car-no-result">⚠️ Car list not loaded. <a href="https://recipelist.innowareapi.com/" target="_blank">Check full list →</a></div>`;
-        return;
-      }
-
-      const matches = recipeList.filter(r => r.toLowerCase().includes(q));
-      if (matches.length === 0) {
-        results.innerHTML = `<div class="car-no-result">No matches found for "<strong>${input.value}</strong>".<br>Try a different spelling or <a href="https://recipelist.innowareapi.com/" target="_blank">browse the full list →</a></div>`;
-      } else {
-        matches.slice(0, 20).forEach(m => {
-          const div = document.createElement('div');
-          div.className = 'car-result-item match';
-          div.textContent = '✅ ' + m;
-          results.appendChild(div);
-        });
-        if (matches.length > 20) {
-          const more = document.createElement('div');
-          more.className = 'car-result-item';
-          more.innerHTML = `...and ${matches.length - 20} more. <a href="https://recipelist.innowareapi.com/" target="_blank">See full list →</a>`;
-          results.appendChild(more);
-        }
-      }
-    });
-  }, 100);
-
-  const loadingMsg = recipeLoaded
-    ? `Type your car brand or model to search ${recipeList.length} supported recipes:`
-    : `Loading car list... (or <a href="https://recipelist.innowareapi.com/" target="_blank">browse full list →</a>)`;
-
-  return `The XBB Dongle works on most cars made after 2010. Search below to check if your car is supported:\n\n<div class="car-search-box"><div class="car-loading">${loadingMsg}</div><input id="${id}" type="text" placeholder="e.g. Volvo, BMW, Volkswagen..." /><div class="car-results" id="${resultsId}"></div></div>\n\n• Cars older than 2010 are generally NOT supported.\n• If your car isn't listed, test with the 14-day return policy.\n🔗 <a href="https://recipelist.innowareapi.com/" target="_blank">Browse full recipe list →</a>`;
-}
-
-
-function findAnswer(query) {
+// ── FAQ MATCHING ──────────────────────────────────────────────────────────────
+function findFaqAnswer(query) {
   const q = query.toLowerCase();
-  let bestMatch = null;
-  let bestScore = 0;
-
+  let best = null, bestScore = 0;
   for (const faq of FAQ) {
     let score = 0;
-    for (const kw of faq.keywords) {
-      if (q.includes(kw.toLowerCase())) {
-        score += kw.split(' ').length;
-      }
+    const kws = [...(faq.keywords[lang]||[]), ...(faq.keywords[lang==='en'?'sv':'en']||[])];
+    for (const kw of kws) {
+      if (q.includes(kw.toLowerCase())) score += kw.split(' ').length;
     }
-    if (score > bestScore) {
-      bestScore = score;
-      bestMatch = faq;
-    }
+    if (score > bestScore) { bestScore = score; best = faq; }
   }
-
-  if (bestScore > 0) {
-    if (bestMatch.answer === '__CAR_SEARCH__') return renderCarSearch();
-    return bestMatch.answer;
-  }
-
-  // Also trigger car search if user mentions a car brand
-  const carBrands = ['volvo','bmw','volkswagen','vw','audi','mercedes','ford','toyota','honda','hyundai','kia','seat','skoda','opel','peugeot','citroen','renault','nissan','mazda','subaru','jeep','land rover','porsche','fiat','alfa','lexus','mitsubishi','suzuki'];
-  for (const brand of carBrands) {
-    if (q.includes(brand)) return renderCarSearch();
-  }
-
-  return `I'm not sure about that specific question. Here are some helpful resources:\n\n🔧 <a href="https://www.xbb.se/en/help/" target="_blank">XBB Support Form →</a>\n❓ <a href="https://www.xbb.se/en/faq/" target="_blank">Full FAQ on xbb.se →</a>\n📖 <a href="https://www.xbb.se/en/snabbguide/" target="_blank">Installation Manual →</a>\n🚗 <a href="https://recipelist.innowareapi.com/" target="_blank">Compatible car list →</a>\n\nTry rephrasing — I cover: compatibility, battery drain, firmware updates, PowerUnit setup, Tesla/Mercedes, and more.`;
+  return bestScore > 0 ? (best.answer[lang] || best.answer.en) : null;
 }
 
-// ── CHAT UI ───────────────────────────────────────────────────────────────────
-function addMessage(role, html) {
+// ── GROQ AI CALL ──────────────────────────────────────────────────────────────
+async function callGroq(userMessage, streamEl) {
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${groqKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: groqModel,
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: userMessage }
+      ],
+      max_tokens: 600,
+      stream: true
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || 'Groq API error');
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let full = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const chunk = decoder.decode(value);
+    const lines = chunk.split('\n').filter(l => l.startsWith('data:'));
+    for (const line of lines) {
+      const data = line.replace('data: ', '');
+      if (data === '[DONE]') break;
+      try {
+        const json = JSON.parse(data);
+        const delta = json.choices?.[0]?.delta?.content || '';
+        full += delta;
+        // Live stream into bubble
+        streamEl.innerHTML = full.replace(/\n/g, '<br>') + '<span class="cursor"></span>';
+        streamEl.closest('.messages').scrollTop = streamEl.closest('.messages').scrollHeight;
+      } catch {}
+    }
+  }
+  // Remove cursor when done
+  streamEl.innerHTML = full.replace(/\n/g, '<br>');
+  return full;
+}
+
+// ── WEB SEARCH LINKS ──────────────────────────────────────────────────────────
+function buildWebLinks(query) {
+  const q = encodeURIComponent(query);
+  const gq = encodeURIComponent('Strands lighting ' + query);
+  const sq = encodeURIComponent(query + ' site:strandseurope.com');
+  const isEn = lang === 'en';
+  return `<div class="search-results">
+<span class="search-badge badge-strands">strandseurope.com</span><br>
+<a class="search-result-item" href="https://strandseurope.com/?s=${q}" target="_blank">
+  <span class="search-result-title">🔍 ${isEn?'Search on strandseurope.com':'Sök på strandseurope.com'}</span>
+  <span class="search-result-url">strandseurope.com</span>
+</a>
+<a class="search-result-item" href="https://duckduckgo.com/?q=${sq}" target="_blank">
+  <span class="search-result-title">🔍 ${isEn?'DuckDuckGo — Strands site search':'DuckDuckGo — Strands webbsökning'}</span>
+  <span class="search-result-url">duckduckgo.com · site:strandseurope.com</span>
+</a>
+<span class="search-badge badge-google" style="margin-top:4px">Google</span><br>
+<a class="search-result-item" href="https://www.google.com/search?q=${gq}" target="_blank">
+  <span class="search-result-title">🔍 ${isEn?'Search on Google':'Sök på Google'}</span>
+  <span class="search-result-url">google.com · Strands lighting</span>
+</a>
+<a class="search-result-item" href="mailto:support@strands.se?subject=${q}">
+  <span class="search-result-title">📧 ${isEn?'Email Strands support':'Mejla Strands support'}</span>
+  <span class="search-result-url">support@strands.se</span>
+</a></div>`;
+}
+
+// ── MODES ─────────────────────────────────────────────────────────────────────
+function toggleAI() { aiOn = !aiOn; updateModes(); }
+function toggleWeb() { webOn = !webOn; updateModes(); }
+
+function updateModes() {
+  const aiBtn = document.getElementById('aiBtn');
+  const webBtn = document.getElementById('webBtn');
+  const aiPill = document.getElementById('aiPill');
+  const statusRight = document.getElementById('statusRight');
+
+  aiBtn.classList.toggle('on', aiOn);
+  webBtn.classList.toggle('on', webOn);
+
+  aiBtn.querySelector('.mdot').style.display = 'block';
+  webBtn.querySelector('.mdot').style.display = 'block';
+
+  if (aiOn && webOn) {
+    aiPill.textContent = '⚡ AI + 🔍 Web';
+    aiPill.className = 'status-pill ai';
+    statusRight.textContent = groqModel.split('-').slice(0,3).join('-');
+  } else if (aiOn) {
+    aiPill.textContent = `⚡ ${groqModel.split('-').slice(0,2).join(' ')}`;
+    aiPill.className = 'status-pill ai';
+    statusRight.textContent = 'Groq AI active';
+  } else if (webOn) {
+    aiPill.textContent = '🔍 Web search ON';
+    aiPill.className = 'status-pill web';
+    statusRight.textContent = 'strandseurope.com + Google';
+  } else {
+    aiPill.textContent = '⚡ FAQ mode';
+    aiPill.className = 'status-pill';
+    statusRight.textContent = 'Strands Support Assistant';
+  }
+
+  // Update search label for web btn
+  webBtn.innerHTML = `<span class="mdot"></span> ${lang==='sv'?'Webb':'Web'}`;
+  aiBtn.innerHTML = `<span class="mdot"></span> AI`;
+  aiBtn.classList.toggle('on', aiOn);
+  webBtn.classList.toggle('on', webOn);
+}
+
+// ── CHAT ──────────────────────────────────────────────────────────────────────
+function addMessage(role, html, streaming = false) {
   const messages = document.getElementById('messages');
   const div = document.createElement('div');
   div.className = `message ${role}`;
+  const avatarLabel = role === 'bot' ? 'STR' : (lang === 'sv' ? 'Du' : 'You');
   div.innerHTML = `
-    <div class="avatar ${role}-avatar">${role === 'bot' ? 'XBB' : 'You'}</div>
-    <div class="bubble">${html.replace(/\n/g, '<br>')}</div>
+    <div class="avatar ${role}-avatar">${avatarLabel}</div>
+    <div class="bubble" id="${streaming ? 'streamBubble' : ''}">${html.replace(/\n/g,'<br>')}</div>
   `;
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
+  return div.querySelector('.bubble');
 }
 
 function showTyping() {
   const messages = document.getElementById('messages');
   const div = document.createElement('div');
   div.className = 'message bot'; div.id = 'typing';
-  div.innerHTML = `<div class="avatar bot-avatar">XBB</div><div class="bubble"><div class="dots"><span></span><span></span><span></span></div></div>`;
+  div.innerHTML = `<div class="avatar bot-avatar">STR</div><div class="bubble"><div class="dots"><span></span><span></span><span></span></div></div>`;
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
 }
 
-function removeTyping() {
-  const t = document.getElementById('typing');
-  if (t) t.remove();
-}
+function removeTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
 
-function ask(btn) {
-  document.getElementById('userInput').value = btn.textContent;
-  sendMessage();
-}
+function ask(btn) { document.getElementById('userInput').value = btn.textContent; sendMessage(); }
 
-function sendMessage() {
+async function sendMessage() {
+  if (isSending) return;
   const input = document.getElementById('userInput');
   const text = input.value.trim();
   if (!text) return;
+
+  isSending = true;
+  document.getElementById('sendBtn').disabled = true;
   document.getElementById('suggestions').style.display = 'none';
   addMessage('user', text);
   input.value = '';
-  showTyping();
-  setTimeout(() => {
+
+  const faqAnswer = findFaqAnswer(text);
+
+  try {
+    if (aiOn) {
+      // GROQ AI MODE
+      showTyping();
+      await new Promise(r => setTimeout(r, 100));
+      removeTyping();
+
+      // Create streaming bubble
+      const messages = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.className = 'message bot';
+      div.innerHTML = `<div class="avatar bot-avatar">STR</div><div class="bubble" id="streamBubble"><span class="cursor"></span></div>`;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+
+      const streamEl = document.getElementById('streamBubble');
+      const aiAnswer = await callGroq(text, streamEl);
+
+      // Append web links if web mode also on
+      if (webOn) {
+        const webLabel = lang === 'sv' ? '<br><br>🔍 <strong>Sök även på webben:</strong><br>' : '<br><br>🔍 <strong>Also search the web:</strong><br>';
+        streamEl.innerHTML += webLabel + buildWebLinks(text);
+      }
+
+    } else if (webOn) {
+      // WEB ONLY MODE — show FAQ answer + web links
+      showTyping();
+      await new Promise(r => setTimeout(r, 400));
+      removeTyping();
+      const intro = lang === 'sv'
+        ? (faqAnswer ? faqAnswer + '\n\n🔍 <strong>Sök även på webben:</strong>' : '🔍 Sök på webben för mer information:')
+        : (faqAnswer ? faqAnswer + '\n\n🔍 <strong>Also search the web:</strong>' : '🔍 Search the web for more information:');
+      addMessage('bot', intro + '<br>' + buildWebLinks(text));
+
+    } else {
+      // FAQ ONLY MODE
+      showTyping();
+      await new Promise(r => setTimeout(r, 500 + Math.random() * 300));
+      removeTyping();
+      addMessage('bot', faqAnswer || UI[lang].fallback);
+    }
+  } catch(e) {
     removeTyping();
-    addMessage('bot', findAnswer(text));
-  }, 500 + Math.random() * 300);
+    const errMsg = lang === 'sv'
+      ? `❌ AI-fel: ${e.message}\n\nFaller tillbaka till FAQ-svar...`
+      : `❌ AI error: ${e.message}\n\nFalling back to FAQ answer...`;
+    addMessage('bot', errMsg);
+    if (faqAnswer) setTimeout(() => addMessage('bot', faqAnswer), 800);
+  }
+
+  isSending = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+// ── LANGUAGE & TABS ───────────────────────────────────────────────────────────
+function setLang(l, btn) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('h-title').textContent = UI[lang].title;
+  document.getElementById('h-sub').textContent = UI[lang].sub;
+  document.getElementById('userInput').placeholder = UI[lang].placeholder;
+  updateModes();
+  renderTabs('all');
+  renderSuggestions('all');
+  document.getElementById('messages').innerHTML = '';
+  addMessage('bot', UI[lang].welcome);
+}
+
+function renderTabs(activeCat) {
+  const u = UI[lang];
+  document.getElementById('tabs').innerHTML = u.tabs.map((t, i) =>
+    `<button class="tab-btn ${u.tabKeys[i]===activeCat?'active':''}" onclick="setCategory('${u.tabKeys[i]}',this)">${t}</button>`
+  ).join('');
+}
+
+function renderSuggestions(cat) {
+  const qs = UI[lang].categories[cat] || UI[lang].categories.all;
+  const sugg = document.getElementById('suggestions');
+  sugg.style.display = 'flex';
+  sugg.innerHTML = qs.map(q => `<button class="suggestion-btn" onclick="ask(this)">${q}</button>`).join('');
+}
+
+function setCategory(cat, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSuggestions(cat);
+}
+
+function initApp() {
+  renderTabs('all');
+  renderSuggestions('all');
+  updateModes();
+  setTimeout(() => addMessage('bot', UI[lang].welcome), 300);
 }
 
 window.onload = () => {
-  loadRecipes(); // fetch live recipe list in background
-  setTimeout(() => {
-    addMessage('bot', `Hi! 👋 I'm the XBB System FAQ assistant. I can help you with:\n\n• Compatible car models\n• XBB Dongle & PowerUnit installation\n• Troubleshooting & firmware updates\n• Tesla, Mercedes & special setups\n\nWhat can I help you with today?`);
-  }, 400);
+  renderTabs('all');
+  renderSuggestions('all');
+
+  // Restore key from session if already entered this session
+  const savedKey = sessionStorage.getItem('groqKey');
+  const savedModel = sessionStorage.getItem('groqModel');
+  if (savedKey && savedKey.startsWith('gsk_')) {
+    groqKey = savedKey;
+    groqModel = savedModel || 'llama-3.3-70b-versatile';
+    document.getElementById('setupOverlay').classList.add('hidden');
+    document.getElementById('modelBadge').textContent = groqModel.split('-').slice(0,2).join(' ');
+    aiOn = true;
+    updateModes();
+    initApp();
+  }
 };
 </script>
 </body>
